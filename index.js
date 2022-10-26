@@ -3,6 +3,7 @@ const express = require('express')
 const app = express();
 const {ExpressPeerServer} = require('peer');
 const http = require('http');
+const https = require('https');
 const session = require('express-session');
 const history = require('connect-history-api-fallback');
 const path = require('path');
@@ -85,7 +86,7 @@ const peer = ExpressPeerServer(server, {
     path: '/peer',
     ssl: process.env.NODE_ENV == 'production' ? {
         key: fs.readFileSync(path.join(__dirname, 'ssl-cert-snakeoil.key')),
-        cert: fs.readFileSync(path.join(__dirname, 'ca-certificates.crt'))
+        cert: fs.readFileSync(path.join(__dirname, 'ssl-cert-snakeoil.pem'))
     } : {}
 });
 require('./peer')(peer)
