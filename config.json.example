@@ -1,0 +1,7 @@
+{
+  "secret": "",
+  "email_user": "",
+  "email_pass": "",
+  "email_port": 465,
+  "email_smtp": ""
+}

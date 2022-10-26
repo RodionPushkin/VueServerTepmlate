@@ -1,7 +1,19 @@
 const {AuthGuard, ExecutePython, GenerateToken, Connect, Disconnect} = require('./lib')
 let connected = []
 module.exports = router => {
-    router.get(`/api/`, AuthGuard, (req, res) => {
+    /**
+    * @swagger
+    * /api:
+    *   get:
+    *       description: AwesomeDescription
+    *       responses:
+    *           '200':
+    *               description: all right
+    * */
+    router.get(`/api/`, (req, res) => {
+        res.json({data: ["ssdfsdf", GenerateToken("text")]})
+    })
+    router.get(`/api/execute`, AuthGuard, (req, res) => {
         ExecutePython('file', (result => {
             res.json({data: [result, GenerateToken("text")]})
         }))

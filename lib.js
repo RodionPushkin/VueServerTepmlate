@@ -1,6 +1,6 @@
 const db = require("./database");
+const config = require("./config.json");
 const PythonShell = require('python-shell').PythonShell;
-const md5 = require('md5')
 
 class lib {
     async AuthGuard(req, res, next) {
@@ -19,7 +19,7 @@ class lib {
     }
 
     GenerateToken(text) {
-        return md5(text)
+        return text
     }
 
     ExecutePython(path = '', callback) {
