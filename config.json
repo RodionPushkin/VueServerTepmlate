@@ -1,7 +1,0 @@
-{
-  "secret": "some secret key",
-  "email_user": "emailservice@internet.ru",
-  "email_pass": "bstUVqDGgBU1UnFShLTQ",
-  "email_port": 465,
-  "email_smtp": "smtp.mail.ru"
-}
