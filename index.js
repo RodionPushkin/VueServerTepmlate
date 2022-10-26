@@ -60,10 +60,8 @@ app.use(require('cors')({
     origin: '*'
 }));
 app.use(ruid());
-app.use(express.json());
-app.use(express.urlencoded());
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(session({
     secret: secret,
@@ -81,14 +79,24 @@ app.use(helmet());
 app.use(compression())
 require('./router')(app)
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
-const server = http.createServer(app);
-const peer = ExpressPeerServer(server, {
-    path: '/peer',
-    ssl: process.env.NODE_ENV == 'production' ? {
+let server;
+let peer
+if(process.env.NODE_ENV == 'production'){
+    const ssl = {
         key: fs.readFileSync(path.join(__dirname, 'ssl-cert-snakeoil.key')),
         cert: fs.readFileSync(path.join(__dirname, 'ssl-cert-snakeoil.pem'))
-    } : {}
-});
+    }
+    server = https.createServer(ssl,app);
+    peer = ExpressPeerServer(server, {
+        path: '/peer',
+        ssl: ssl
+    });
+}else{
+    server = http.createServer(app);
+    peer = ExpressPeerServer(server, {
+        path: '/peer',
+    });
+}
 require('./peer')(peer)
 app.use('/', peer);
 app.use(express.static(path.join(__dirname, 'static')));

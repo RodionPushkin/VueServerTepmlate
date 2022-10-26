@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        body{
+            display: flex;
+            gap: 24px;
+            flex-direction: column;
+        }
+        div{
+            cursor: pointer;
+            padding: 24px;
+            background: #073ae8;
+            color: #ffffff;
+        }
+    </style>
+    <script src="/socket.io.js"></script>
+    <script src="/peerjs.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+<p id="text"></p>
+<input id="input" type="text">
+<div id="button">connect</div>
+<div id="send">send</div>
+<script defer>
+    let peer = new Peer(undefined,{
+        host: 'localhost',
+        port: '80',
+        path: '/'
+    });
+    // let socket = io();
+    peer.on('open', function(id) {
+        console.log('My peer ID is: ' + id);
+        document.getElementById('text').innerHTML = id
+    });
+    let conn = undefined
+    peer.on('connection', function(connection) {
+        console.log(connection)
+        conn = connection
+        conn.on('open', ()=>{
+            console.log(conn)
+            // Receive messages
+            conn.on('data', (data) => {
+                console.log('Received', data);
+            });
+        })
+    });
+    let i = 0
+    document.getElementById('button').addEventListener('click',()=>{
+        console.log('click')
+        conn = peer.connect(document.getElementById('input').value);
+        // peer.connect(document.getElementById('input').value).then(res=>{
+        //     console.log(res)
+        // })
+        // console.log(1)
+        // setTimeout(()=>{
+        //     console.log(2)
+        //     conn.on('open', ()=>{
+        //         console.log(conn)
+        //         // Receive messages
+        //         conn.on('data', (data) => {
+        //             console.log('Received', data);
+        //         });
+        //     })
+        // },300)
+    })
+    document.getElementById('send').addEventListener('click',()=>{
+        if(conn){
+            i++
+            console.log('Hello!'+i)
+            conn.send('Hello!'+i);
+        }
+    })
+
+
+</script>
+</body>
+</html>
