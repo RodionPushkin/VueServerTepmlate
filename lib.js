@@ -31,16 +31,41 @@ class lib {
     }
 
     async Connect(connected, req, res) {
-        connected.push({id: req.rid, req: req, res: res})
-        return await connected
+        return await db.query(`INSERT INTO "connection" (id,id_user) VALUES ('${req.rid}',1)`).then(() => {
+            connected.push({id: req.rid, req: req, res: res})
+            return connected
+        })
     }
 
     async Disconnect(connected, req, res) {
-        return connected.filter(item => req.rid == item.id)
+        return await db.query(`DELETE FROM "connection" WHERE id='${req.rid}'`).then(() => {
+            connected.filter(item => req.rid == item.id)
+            return connected
+        })
     }
 
-    async Notify(id, data = []) {
-
+    async Notify(connected, id) {
+        if (Array.isArray(id)) {
+            return await db.query(`SELECT * FROM "connection" WHERE id_user=${id[0]}`).then(res => res.rows).then(connections => {
+                connections.forEach(connection => {
+                    connection = connected.find(item => item.id == connection.id)
+                    connection.res.json('some new prikoli')
+                    connected.filter(conn => conn.id == connection.id)
+                })
+                return connected
+            })
+        } else {
+            return await db.query(`SELECT * FROM "connection" WHERE id_user=${id}`).then(res => res.rows).then(connections => {
+                connections.forEach(connection => {
+                    // console.log(connected)
+                    // console.log(connection)
+                    connection = connected.find(item => item.id == connection.id)
+                    connection.res.json('some new prikoli')
+                    connected.filter(conn => conn.id == connection.id)
+                })
+                return connected
+            })
+        }
     }
 }
 

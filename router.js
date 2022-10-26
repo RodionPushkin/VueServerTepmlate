@@ -1,4 +1,4 @@
-const {AuthGuard, ExecutePython, GenerateToken, Connect, Disconnect} = require('./lib')
+const {AuthGuard, ExecutePython, GenerateToken, Connect, Disconnect, Notify} = require('./lib')
 let connected = []
 module.exports = router => {
     /**
@@ -24,7 +24,15 @@ module.exports = router => {
     router.get('/api/connect/', async (req, res) => {
         connected = await Connect(connected, req, res)
         req.on('close', async () => {
+            console.log('closed')
             connected = await Disconnect(connected, req, res)
+        })
+    })
+    router.get('/api/notify/', async (req, res) => {
+        Notify(connected, 1).then(data => {
+            connected = data
+            console.log(data.length)
+            res.json('sended')
         })
     })
 }
