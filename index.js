@@ -69,7 +69,10 @@ app.use(session({
     saveUninitialized: false,
     proxy: true,
     cookie: {
+        path: '/',
         maxAge: 2592000000,
+        secure: process.env.NODE_ENV == 'production',
+        httpOnly: true
     },
 }));
 app.use(helmet());
