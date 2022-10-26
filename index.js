@@ -16,6 +16,7 @@ const fileUpload = require('express-fileupload');
 const swaggerJsDoc = require('swagger-jsdoc')
 const helmet = require("helmet");
 const swaggerUi = require('swagger-ui-express')
+const fs = require('fs')
 const swaggerOptions = {
     swaggerDefinition: {
         info: {
@@ -81,7 +82,11 @@ require('./router')(app)
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 const server = http.createServer(app);
 const peer = ExpressPeerServer(server, {
-    path: '/peer'
+    path: '/peer',
+    ssl: process.env.NODE_ENV == 'production' ? {
+        key: fs.readFileSync(path.join(__dirname, 'ssl-cert-snakeoil.key')),
+        cert: fs.readFileSync(path.join(__dirname, 'ca-certificates.crt'))
+    } : {}
 });
 require('./peer')(peer)
 app.use('/', peer);
