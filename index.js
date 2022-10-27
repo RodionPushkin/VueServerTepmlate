@@ -83,8 +83,8 @@ let server;
 let peer
 if(process.env.NODE_ENV == 'production'){
     const ssl = {
-        key: fs.readFileSync(path.join(__dirname, 'ssl-cert-snakeoil.key')),
-        cert: fs.readFileSync(path.join(__dirname, 'ssl-cert-snakeoil.pem'))
+        key: fs.readFileSync(path.join(__dirname, 'privkey.key')),
+        cert: fs.readFileSync(path.join(__dirname, 'fullchain.pem'))
     }
     server = https.createServer(ssl,app);
     peer = ExpressPeerServer(server, {
