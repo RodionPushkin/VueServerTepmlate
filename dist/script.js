@@ -1,14 +1,14 @@
-// let peer = new Peer(undefined, {
-//     host: 'rodionpushkin.ru',
-//     secure: true,
-//     port: '443',
-//     path: '/peerjs'
-// });
 let peer = new Peer(undefined, {
-    host: 'localhost',
-    port: '80',
-    path: '/'
+    host: 'rodionpushkin.ru',
+    secure: true,
+    port: '443',
+    path: '/peerjs'
 });
+// let peer = new Peer(undefined, {
+//     host: 'localhost',
+//     port: '80',
+//     path: '/'
+// });
 peer.on('open', function (id) {
     console.log('My peer ID is: ' + id);
     document.getElementById('text').innerHTML = id
