@@ -9,45 +9,53 @@ let peer = new Peer(undefined, {
 //     port: '80',
 //     path: '/'
 // });
+let self
+let connections = {
+
+}
 peer.on('open', function (id) {
-    console.log('My peer ID is: ' + id);
+    self = id
     document.getElementById('text').innerHTML = id
 });
-let conn = undefined
-peer.on('connection', function (connection) {
-    console.log(connection)
-    conn = connection
-    conn.on('open', () => {
-        console.log(conn)
-        // Receive messages
-        conn.on('data', (data) => {
-            console.log('Received', data);
-        });
+navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: true
+}).then(stream=>{
+    let video = document.createElement('video')
+    video.muted = true
+    video.srcObject = stream
+    video.addEventListener('loadedmetadata', ()=>{
+        video.play()
     })
-});
-let i = 0
-document.getElementById('button').addEventListener('click', () => {
-    console.log('click')
-    conn = peer.connect(document.getElementById('input').value);
-    // peer.connect(document.getElementById('input').value).then(res=>{
-    //     console.log(res)
-    // })
-    // console.log(1)
-    // setTimeout(()=>{
-    //     console.log(2)
-    //     conn.on('open', ()=>{
-    //         console.log(conn)
-    //         // Receive messages
-    //         conn.on('data', (data) => {
-    //             console.log('Received', data);
-    //         });
-    //     })
-    // },300)
+    document.body.append(video)
+    let video2 = document.createElement('video')
+    peer.on('call', function (call) {
+        console.log('call')
+        if(connections.call == undefined && call.peer != self){
+            connections.call = call
+            connections.call.answer()
+            connections.call.on('stream',(videostream)=>{
+                console.log(1)
+                video2.srcObject = videostream
+                video2.addEventListener('loadedmetadata', ()=>{
+                    video2.play()
+                })
+                document.body.append(video2)
+            })
+            console.log(connections.call)
+            connections.call = peer.call(connections.call.peer,stream);
+        }
+    });
+    document.getElementById('button').addEventListener('click', () => {
+        peer.call(document.getElementById('input').value,stream);
+    })
 })
+let i = 0
 document.getElementById('send').addEventListener('click', () => {
-    if (conn) {
+    if (connections.to) {
         i++
-        console.log('Hello!' + i)
-        conn.send('Hello!' + i);
+        console.log(`hello from ${self}`)
+        connections.to.send(`{i} hello from ${self}`);
+        // connections.self.send(${i} hello from ${self});
     }
 })
