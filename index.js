@@ -78,9 +78,11 @@ app.use(session({
 app.use(helmet());
 app.use(compression())
 app.enable('trust proxy')
-app.use((req, res, next) => {
-    req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
-})
+if(process.env.NODE_ENV == 'production'){
+    app.use((req, res, next) => {
+        req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
+    })
+}
 let server;
 let peer
 if(process.env.NODE_ENV == 'production'){

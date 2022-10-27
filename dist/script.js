@@ -1,7 +1,12 @@
+// let peer = new Peer(undefined, {
+//     host: 'rodionpushkin.ru',
+//     secure: true,
+//     port: '443',
+//     path: '/peerjs'
+// });
 let peer = new Peer(undefined, {
-    host: 'rodionpushkin.ru',
-    secure: true,
-    port: '443',
+    host: 'localhost',
+    port: '80',
     path: '/'
 });
 peer.on('open', function (id) {
