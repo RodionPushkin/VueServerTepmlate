@@ -106,7 +106,7 @@ app.use(history({
 }));
 app.use(express.static(path.join(__dirname, 'dist')));
 try {
-    server.listen(port, () => {
+    server.listen(process.env.NODE_ENV == 'production' ? 443 : port, () => {
         console.clear()
         console.log(`Server started on: http://${process.env.DOMAIN}:${port} at ${new Date().toLocaleString('ru')}`)
         db.checkConnection()
