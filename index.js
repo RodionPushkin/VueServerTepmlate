@@ -128,6 +128,9 @@
 // }
 
 const app = require('express')()
+app.get('/', (req, res) => {
+    res.send('srtdtfytguhijo;kojghfdrtyuijkhgvfcdxrtfy8u9i0ibhvgserr5t68')
+})
 app.listen(80, () => {
     console.log("durak")
 })
