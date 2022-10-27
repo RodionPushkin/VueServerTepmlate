@@ -4,6 +4,7 @@ const app = express();
 const {ExpressPeerServer} = require('peer');
 const http = require('http');
 const https = require('https');
+const httpsRedirect = require('express-https-redirect');
 const session = require('cookie-session');
 const history = require('connect-history-api-fallback');
 const path = require('path');
@@ -36,18 +37,18 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 const limiter = require("express-rate-limit");
 const slowDown = require("express-slow-down");
 const compression = require("compression");
-// app.use(limiter({
-//     windowMs: 3 * 60 * 1000,
-//     max: 100,
-//     message: 'Too many accounts created from this IP, please try again after an 3 min',
-//     standardHeaders: true,
-//     legacyHeaders: false,
-// }))
-// app.use(slowDown({
-//     windowMs: 15 * 60 * 1000,
-//     delayAfter: 100,
-//     delayMs: 500
-// }))
+app.use(limiter({
+    windowMs: 3 * 60 * 1000,
+    max: 100,
+    message: 'Too many accounts created from this IP, please try again after an 3 min',
+    standardHeaders: true,
+    legacyHeaders: false,
+}))
+app.use(slowDown({
+    windowMs: 15 * 60 * 1000,
+    delayAfter: 100,
+    delayMs: 500
+}))
 app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: '/tmp/',
@@ -79,15 +80,16 @@ app.use(helmet());
 app.use(compression())
 let server;
 let peer
-if(process.env.NODE_ENV == 'production'){
+if(process.env.NODE_ENV == 'production') {
     // app.get('*', (req, res, next) => {
     //     req.secure ? next() : res.redirect('https://' + req.headers.host + req.url);
     // })
-    app.enable('trust proxy')
-    app.use((req, res, next) => {
-        console.log(req.secure)
-        req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
-    })
+    // app.enable('trust proxy')
+    // app.use((req, res, next) => {
+    //     console.log(req.secure)
+    //     req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
+    // })
+    app.use('/', httpsRedirect())
     const ssl = {
         key: fs.readFileSync(path.join(__dirname, 'privkey.pem')),
         cert: fs.readFileSync(path.join(__dirname, 'fullchain.pem'))
