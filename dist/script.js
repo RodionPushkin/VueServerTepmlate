@@ -1,5 +1,5 @@
 let peer = new Peer(undefined, {
-    host: 'https://rodionpushkin.ru/',
+    host: 'rodionpushkin.ru',
     secure: true,
     port: '443',
     path: '/'
