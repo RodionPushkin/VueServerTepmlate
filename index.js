@@ -37,18 +37,18 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 const limiter = require("express-rate-limit");
 const slowDown = require("express-slow-down");
 const compression = require("compression");
-app.use(limiter({
-    windowMs: 3 * 60 * 1000,
-    max: 100,
-    message: 'Too many accounts created from this IP, please try again after an 3 min',
-    standardHeaders: true,
-    legacyHeaders: false,
-}))
-app.use(slowDown({
-    windowMs: 15 * 60 * 1000,
-    delayAfter: 100,
-    delayMs: 500
-}))
+// app.use(limiter({
+//     windowMs: 3 * 60 * 1000,
+//     max: 100,
+//     message: 'Too many accounts created from this IP, please try again after an 3 min',
+//     standardHeaders: true,
+//     legacyHeaders: false,
+// }))
+// app.use(slowDown({
+//     windowMs: 15 * 60 * 1000,
+//     delayAfter: 100,
+//     delayMs: 500
+// }))
 app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: '/tmp/',
