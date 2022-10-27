@@ -50,12 +50,3 @@ navigator.mediaDevices.getUserMedia({
         peer.call(document.getElementById('input').value,stream);
     })
 })
-let i = 0
-document.getElementById('send').addEventListener('click', () => {
-    if (connections.to) {
-        i++
-        console.log(`hello from ${self}`)
-        connections.to.send(`{i} hello from ${self}`);
-        // connections.self.send(${i} hello from ${self});
-    }
-})

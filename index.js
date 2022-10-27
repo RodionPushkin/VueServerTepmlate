@@ -10,7 +10,7 @@ const path = require('path');
 const db = require("./database");
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const port = process.env.PORT || 80;
+const port = process.env.NODE_ENV == 'production' ? 443 : process.env.PORT || 80;
 const ruid = require('express-ruid');
 const {secret} = require('./config.json');
 const fileUpload = require('express-fileupload');
@@ -77,15 +77,16 @@ app.use(session({
 }));
 app.use(helmet());
 app.use(compression())
-app.enable('trust proxy')
-if(process.env.NODE_ENV == 'production'){
-    app.use((req, res, next) => {
-        req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
-    })
-}
 let server;
 let peer
 if(process.env.NODE_ENV == 'production'){
+    app.get('*', (req, res, next) => {
+        req.secure ? next() : res.redirect('https://' + req.headers.host + req.url);
+    })
+    app.enable('trust proxy')
+    app.use((req, res, next) => {
+        req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
+    })
     const ssl = {
         key: fs.readFileSync(path.join(__dirname, 'privkey.pem')),
         cert: fs.readFileSync(path.join(__dirname, 'fullchain.pem'))
@@ -112,9 +113,9 @@ app.use(history({
 }));
 app.use(express.static(path.join(__dirname, 'dist')));
 try {
-    server.listen(process.env.NODE_ENV == 'production' ? 443 : port, () => {
+    server.listen( port, () => {
         console.clear()
-        console.log(`Server started on: http://${process.env.DOMAIN}:${port} at ${new Date().toLocaleString('ru')}`)
+        console.log(`Server started on: http${process.env.NODE_ENV == 'production' ? 's' : ''}://${process.env.DOMAIN}:${port} at ${new Date().toLocaleString('ru')}`)
         db.checkConnection()
     });
 } catch (e) {
