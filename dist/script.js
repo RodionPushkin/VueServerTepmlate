@@ -1,17 +1,18 @@
-let peer = new Peer(undefined,{
+let peer = new Peer(undefined, {
     host: 'https://rodionpushkin.ru/',
+    secure: true,
     port: '443',
     path: '/'
 });
-peer.on('open', function(id) {
+peer.on('open', function (id) {
     console.log('My peer ID is: ' + id);
     document.getElementById('text').innerHTML = id
 });
 let conn = undefined
-peer.on('connection', function(connection) {
+peer.on('connection', function (connection) {
     console.log(connection)
     conn = connection
-    conn.on('open', ()=>{
+    conn.on('open', () => {
         console.log(conn)
         // Receive messages
         conn.on('data', (data) => {
@@ -20,7 +21,7 @@ peer.on('connection', function(connection) {
     })
 });
 let i = 0
-document.getElementById('button').addEventListener('click',()=>{
+document.getElementById('button').addEventListener('click', () => {
     console.log('click')
     conn = peer.connect(document.getElementById('input').value);
     // peer.connect(document.getElementById('input').value).then(res=>{
@@ -38,10 +39,10 @@ document.getElementById('button').addEventListener('click',()=>{
     //     })
     // },300)
 })
-document.getElementById('send').addEventListener('click',()=>{
-    if(conn){
+document.getElementById('send').addEventListener('click', () => {
+    if (conn) {
         i++
-        console.log('Hello!'+i)
-        conn.send('Hello!'+i);
+        console.log('Hello!' + i)
+        conn.send('Hello!' + i);
     }
 })
