@@ -92,14 +92,13 @@ if(process.env.NODE_ENV == 'production'){
     }
     server = https.createServer(ssl,app);
     peer = ExpressPeerServer(server, {
-        path: '/peer',
+        path: '/peerjs',
         ssl: ssl
     });
-    serverhttp = http.createServer(app);
 }else{
     server = http.createServer(app);
     peer = ExpressPeerServer(server, {
-        path: '/peer',
+        path: '/peerjs',
     });
 }
 require('./peer')(peer)
@@ -116,11 +115,6 @@ try {
         console.log(`Server started on: http://${process.env.DOMAIN}:${port} at ${new Date().toLocaleString('ru')}`)
         db.checkConnection()
     });
-    if(process.env.NODE_ENV == 'production'){
-        serverhttp.listen(port,()=>{
-
-        })
-    }
 } catch (e) {
     console.log(e)
 }
