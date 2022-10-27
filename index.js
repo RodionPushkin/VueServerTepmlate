@@ -80,6 +80,8 @@ app.use(helmet());
 app.use(compression())
 let server;
 let peer
+let i = 0
+const customGenerationFunction = () => (++i);
 if (process.env.NODE_ENV == 'production') {
     // app.get('*', (req, res, next) => {
     //     req.secure ? next() : res.redirect('https://' + req.headers.host + req.url);
@@ -97,7 +99,6 @@ if (process.env.NODE_ENV == 'production') {
     server = https.createServer(ssl, app);
     // serverHttp = http.createServer(app);
     // serverHttp.listen(80)
-    let i = 0
     peer = ExpressPeerServer(server, {
         path: '/peerjs',
         ssl: ssl,
