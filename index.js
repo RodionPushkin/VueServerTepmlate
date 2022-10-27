@@ -97,9 +97,12 @@ if (process.env.NODE_ENV == 'production') {
     server = https.createServer(ssl, app);
     // serverHttp = http.createServer(app);
     // serverHttp.listen(80)
+    let i = 0
     peer = ExpressPeerServer(server, {
         path: '/peerjs',
-        ssl: ssl
+        ssl: ssl,
+        proxied: true,
+        generateClientId: i++
     });
 } else {
     server = http.createServer(app);
