@@ -80,18 +80,19 @@ app.use(compression())
 let server;
 let peer
 if(process.env.NODE_ENV == 'production'){
-    app.get('*', (req, res, next) => {
-        req.secure ? next() : res.redirect('https://' + req.headers.host + req.url);
-    })
+    // app.get('*', (req, res, next) => {
+    //     req.secure ? next() : res.redirect('https://' + req.headers.host + req.url);
+    // })
     app.enable('trust proxy')
     app.use((req, res, next) => {
+        console.log(req.secure)
         req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
     })
     const ssl = {
         key: fs.readFileSync(path.join(__dirname, 'privkey.pem')),
         cert: fs.readFileSync(path.join(__dirname, 'fullchain.pem'))
     }
-    server = https.createServer(ssl,app);
+    server = https.createServer(ssl, app);
     peer = ExpressPeerServer(server, {
         path: '/peerjs',
         ssl: ssl
