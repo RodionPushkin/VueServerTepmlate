@@ -89,16 +89,19 @@ if(process.env.NODE_ENV == 'production') {
     //     console.log(req.secure)
     //     req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
     // })
-    // app.use('/', httpsRedirect())
+    app.use(httpsRedirect())
     const ssl = {
         key: fs.readFileSync(path.join(__dirname, 'privkey.pem')),
         cert: fs.readFileSync(path.join(__dirname, 'fullchain.pem'))
     }
     server = https.createServer(ssl, app);
+    serverHttp = http.createServer(app);
+    serverHttp.listen(80)
     peer = ExpressPeerServer(server, {
         path: '/peerjs',
         ssl: ssl
     });
+
 }else{
     server = http.createServer(app);
     peer = ExpressPeerServer(server, {
