@@ -77,6 +77,10 @@ app.use(session({
 }));
 app.use(helmet());
 app.use(compression())
+app.enable('trust proxy')
+app.use((req, res, next) => {
+    req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
+})
 require('./router')(app)
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 let server;
@@ -91,6 +95,7 @@ if(process.env.NODE_ENV == 'production'){
         path: '/peer',
         ssl: ssl
     });
+    serverhttp = http.createServer(app);
 }else{
     server = http.createServer(app);
     peer = ExpressPeerServer(server, {
@@ -111,6 +116,11 @@ try {
         console.log(`Server started on: http://${process.env.DOMAIN}:${port} at ${new Date().toLocaleString('ru')}`)
         db.checkConnection()
     });
+    if(process.env.NODE_ENV == 'production'){
+        serverhttp.listen(port,()=>{
+
+        })
+    }
 } catch (e) {
     console.log(e)
 }
