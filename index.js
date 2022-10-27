@@ -99,10 +99,10 @@ if(process.env.NODE_ENV == 'production'){
         path: '/peerjs',
     });
 }
+app.use('/', peer);
 require('./peer')(peer)
 require('./router')(app)
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
-app.use('/', peer);
 app.use(express.static(path.join(__dirname, 'static')));
 app.use(express.static(path.join(__dirname, 'dist')));
 app.use(history({
