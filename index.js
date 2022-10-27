@@ -128,9 +128,9 @@
 // }
 
 const app = require('express')()
-app.get('/', (req, res) => {
-    res.send('srtdtfytguhijo;kojghfdrtyuijkhgvfcdxrtfy8u9i0ibhvgserr5t68')
+app.get('/api/', (req, res) => {
+    res.json({gay: "yes"})
 })
-app.listen(80, () => {
+app.listen(8080, () => {
     console.log("durak")
 })
