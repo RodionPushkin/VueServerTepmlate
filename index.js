@@ -81,8 +81,6 @@ app.enable('trust proxy')
 app.use((req, res, next) => {
     req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
 })
-require('./router')(app)
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 let server;
 let peer
 if(process.env.NODE_ENV == 'production'){
@@ -102,6 +100,8 @@ if(process.env.NODE_ENV == 'production'){
     });
 }
 require('./peer')(peer)
+require('./router')(app)
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 app.use('/', peer);
 app.use(express.static(path.join(__dirname, 'static')));
 app.use(express.static(path.join(__dirname, 'dist')));
