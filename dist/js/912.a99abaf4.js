@@ -1,2 +1,2 @@
 "use strict";(self["webpackChunkawesomeclient"]=self["webpackChunkawesomeclient"]||[]).push([[912],{7912:function(e,t,n){n.r(t),n.d(t,{default:function(){return o}});var a=n(3396),r=n(7139);const s={class:"m"};function c(e,t,n,c,i,u){return(0,a.wg)(),(0,a.iD)("div",null,[(0,a._)("p",s,"Упс, ошибка 404, вы будете перенесены на главную страницу через "+(0,r.zw)(i.time)+" сек.",1)])}n(7658);var i={name:"room",data(){return{time:15}},async mounted(){let e=setInterval((()=>{this.time--,this.time<=0&&(this.$router.push("/"),clearInterval(e))}),1e3)}},u=n(89);const l=(0,u.Z)(i,[["render",c],["__scopeId","data-v-73ceaea2"]]);var o=l}}]);
-//# sourceMappingURL=912.e168ecf4.js.map
+//# sourceMappingURL=912.a99abaf4.js.map
