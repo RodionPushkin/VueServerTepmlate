@@ -3,7 +3,7 @@ const express = require('express')
 const app = express();
 const {ExpressPeerServer} = require('peer');
 const http = require('http');
-const https = require('https');
+const https = require('spdy');
 const httpsRedirect = require('express-https-redirect');
 const session = require('cookie-session');
 const history = require('connect-history-api-fallback');
@@ -19,6 +19,8 @@ const swaggerJsDoc = require('swagger-jsdoc')
 const helmet = require("helmet");
 const swaggerUi = require('swagger-ui-express')
 const fs = require('fs')
+const {promisify} = require("util")
+const readFile = promisify(fs.readFile)
 const swaggerOptions = {
     swaggerDefinition: {
         info: {
@@ -88,6 +90,41 @@ if (process.env.NODE_ENV == 'production') {
         key: fs.readFileSync(path.join(__dirname, 'privkey.pem')),
         cert: fs.readFileSync(path.join(__dirname, 'fullchain.pem'))
     }
+    app.get("/push", async (req, res) => {
+        try {
+            let files = []
+            await fs.readdir('./dist/', (err, readedfiles) => {
+                readedfiles.filter(item=>item.includes('.') && item != '.gitkeep' && item != 'index.html').forEach(file=>{
+                    files.push(file)
+                })
+            });
+            await fs.readdir('./dist/js', (err, readedfiles) => {
+                readedfiles.filter(item=>item.includes('.') && item != '.gitkeep').forEach(file=>{
+                    files.push(file)
+                })
+            });
+            await fs.readdir('./dist/css', (err, readedfiles) => {
+                readedfiles.filter(item=>item.includes('.') && item != '.gitkeep').forEach(file=>{
+                    files.push(file)
+                })
+            });
+            await fs.readdir('./dist/sounds', (err, readedfiles) => {
+                readedfiles.filter(item=>item.includes('.') && item != '.gitkeep').forEach(file=>{
+                    files.push(file)
+                })
+            });
+            if(res.push){
+                files.forEach(async (file) => {
+                    res.push(file, {}).end(await readFile(`dist${file}`))
+                })
+            }
+
+            res.writeHead(200)
+            res.end(await readFile("dist/index.html"))
+        }catch(error){
+            res.status(500).send(error.toString())
+        }
+    })
     server = https.createServer(ssl, app);
     peer = ExpressPeerServer(server, {
         path: '/peerjs',

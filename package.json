@@ -32,6 +32,7 @@
     "pg": "^8.8.0",
     "python-shell": "^3.0.1",
     "sharp": "^0.31.1",
+    "spdy": "^4.0.2",
     "swagger-jsdoc": "^6.2.5",
     "swagger-ui-express": "^4.5.0",
     "uuid": "^9.0.0",
