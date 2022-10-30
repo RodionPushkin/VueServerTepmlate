@@ -71,7 +71,7 @@ app.use(session({
     proxy: true,
     cookie: {
         path: '/',
-        maxAge: 2592000000,
+        maxAge: 30 * 24 * 60 * 60 * 1000,
         secure: process.env.NODE_ENV == 'production',
         httpOnly: true
     },
@@ -94,26 +94,26 @@ if (process.env.NODE_ENV == 'production') {
         try {
             let files = []
             await fs.readdir('./dist/', (err, readedfiles) => {
-                readedfiles.filter(item=>item.includes('.') && item != '.gitkeep' && item != 'index.html').forEach(file=>{
+                readedfiles.filter(item => item.includes('.') && item != '.gitkeep' && item != 'index.html').forEach(file => {
                     files.push(file)
                 })
             });
             await fs.readdir('./dist/js', (err, readedfiles) => {
-                readedfiles.filter(item=>item.includes('.') && item != '.gitkeep').forEach(file=>{
+                readedfiles.filter(item => item.includes('.') && item != '.gitkeep').forEach(file => {
                     files.push(file)
                 })
             });
             await fs.readdir('./dist/css', (err, readedfiles) => {
-                readedfiles.filter(item=>item.includes('.') && item != '.gitkeep').forEach(file=>{
+                readedfiles.filter(item => item.includes('.') && item != '.gitkeep').forEach(file => {
                     files.push(file)
                 })
             });
             await fs.readdir('./dist/sounds', (err, readedfiles) => {
-                readedfiles.filter(item=>item.includes('.') && item != '.gitkeep').forEach(file=>{
+                readedfiles.filter(item => item.includes('.') && item != '.gitkeep').forEach(file => {
                     files.push(file)
                 })
             });
-            if(res.push){
+            if (res.push) {
                 files.forEach(async (file) => {
                     res.push(file, {}).end(await readFile(`dist${file}`))
                 })
@@ -121,7 +121,7 @@ if (process.env.NODE_ENV == 'production') {
 
             res.writeHead(200)
             res.end(await readFile("dist/index.html"))
-        }catch(error){
+        } catch (error) {
             res.status(500).send(error.toString())
         }
     })
@@ -131,8 +131,7 @@ if (process.env.NODE_ENV == 'production') {
         ssl: ssl,
         proxied: true,
     });
-}
-else {
+} else {
     server = http.createServer(app);
     peer = ExpressPeerServer(server, {
         path: '/peerjs',

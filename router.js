@@ -39,8 +39,11 @@ module.exports = router => {
             if (await db.query(`SELECT * FROM "user" WHERE "email" = '${candidate.email}'`).then(result => result.rowCount) > 0) throw ApiException.BadRequest('пользователь уже зарегистрирован!', [])
             const user = await db.query(`INSERT INTO "user" ("email","password","activation_link") VALUES ('${candidate.email}','${candidate.password}','${candidate.activation_link}') RETURNING "id","email","password","activation_link"`).then(result => result.rows[0])
             const tokens = tokenService.generate(user)
-            await tokenService.save(user.id, tokens.refreshToken, uuid.v4())
-            res.cookie('refreshToken', tokens.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
+            const deviceID = uuid.v4()
+            await tokenService.save(user.id, tokens.refreshToken, deviceID)
+            res.cookie('deviceID', deviceID, {maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: true, secure: process.env.NODE_ENV ? process.env.NODE_ENV == "production" : false})
+            res.cookie('refreshToken', tokens.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true, secure: process.env.NODE_ENV ? process.env.NODE_ENV == "production" : false})
+            console.log(await tokenService.validate(tokens.accessToken, deviceID))
             delete user.id
             res.json({...tokens, user})
         } catch (e) {
