@@ -1,5 +1,6 @@
-const {AuthGuard, ExecutePython, GenerateToken, Connect, Disconnect, Notify} = require('./lib')
-let connected = []
+const authMiddleware = require('./middleware/auth.middleware')
+const corsMiddleware = require('./middleware/cors.middleware')
+const corsAllMiddleware = require('./middleware/cors.all.middleware')
 module.exports = router => {
     /**
      * @swagger
@@ -10,29 +11,10 @@ module.exports = router => {
      *           '200':
      *               description: all right
      * */
-    router.get(`/api/`, (req, res) => {
-        // req.session.views =
-        if(!req.session.views) req.session.views = 0
-        req.session.views++
-        res.json({data: [req.session.views, GenerateToken("text")]})
+    router.get(`/api`, [corsMiddleware], (req, res) => {
+        res.json({data: "cool"})
     })
-    router.get(`/api/execute`, AuthGuard, (req, res) => {
-        ExecutePython('file', (result => {
-            res.json({data: [result, GenerateToken("text")]})
-        }))
-    })
-    router.get('/api/connect/', async (req, res) => {
-        connected = await Connect(connected, req, res)
-        req.on('close', async () => {
-            console.log('closed')
-            connected = await Disconnect(connected, req, res)
-        })
-    })
-    router.get('/api/notify/', async (req, res) => {
-        Notify(connected, 1).then(data => {
-            connected = data
-            console.log(data.length)
-            res.json('sended')
-        })
+    router.get(`/api/auth`, [corsAllMiddleware,authMiddleware], (req, res) => {
+        res.json({data: "cool"})
     })
 }

@@ -21,11 +21,15 @@ const swaggerUi = require('swagger-ui-express')
 const fs = require('fs')
 const {promisify} = require("util")
 const readFile = promisify(fs.readFile)
+const limiter = require("express-rate-limit");
+const slowDown = require("express-slow-down");
+const compression = require("compression");
+const errorMiddleware = require('./middleware/error.middleware')
 const swaggerOptions = {
     swaggerDefinition: {
         info: {
-            title: "some title",
-            description: "some description",
+            title: "Документация",
+            description: "ниже представлена документация по моему api",
             contact: {
                 name: "Rodion Pushkin",
                 url: "https://t.me/RodionPushkin"
@@ -36,9 +40,11 @@ const swaggerOptions = {
     apis: ['./router.js', './peer.js']
 }
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
-const limiter = require("express-rate-limit");
-const slowDown = require("express-slow-down");
-const compression = require("compression");
+// app.use(require('cors')({
+//     credentials: true,
+//     methods: ['OPTION', 'GET', 'POST', 'PUT', 'DELETE'],
+//     origin: process.env.DOMAIN ? process.env.DOMAIN : 'http://localhost'
+// }));
 app.use(limiter({
     windowMs: 3 * 60 * 1000,
     max: 100,
@@ -57,15 +63,7 @@ app.use(fileUpload({
     abortOnLimit: true,
     limits: {fileSize: 50 * 1024 * 1024},
 }));
-app.use(require('cors')({
-    credentials: true,
-    methods: ['OPTION', 'GET', 'POST', 'PUT', 'DELETE'],
-    origin: '*'
-}));
 app.use(ruid());
-app.use(cookieParser());
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
 app.use(session({
     secret: secret,
     resave: false,
@@ -78,11 +76,13 @@ app.use(session({
         httpOnly: true
     },
 }));
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 app.use(helmet());
 app.use(compression())
 let server;
 let peer
-let i = 0
 if (process.env.NODE_ENV == 'production') {
     app.enable('trust proxy')
     app.use(httpsRedirect())
@@ -131,7 +131,8 @@ if (process.env.NODE_ENV == 'production') {
         ssl: ssl,
         proxied: true,
     });
-} else {
+}
+else {
     server = http.createServer(app);
     peer = ExpressPeerServer(server, {
         path: '/peerjs',
@@ -147,9 +148,9 @@ app.use(history({
     index: '/index.html'
 }));
 app.use(express.static(path.join(__dirname, 'dist')));
+app.use(errorMiddleware)
 try {
     server.listen(port, () => {
-        console.clear()
         console.log(`Server started on: http${process.env.NODE_ENV == 'production' ? 's' : ''}://${process.env.DOMAIN}:${port} at ${new Date().toLocaleString('ru')}`)
         db.checkConnection()
     });
