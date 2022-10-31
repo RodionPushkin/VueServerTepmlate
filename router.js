@@ -8,6 +8,7 @@ const {body, validationResult} = require('express-validator');
 const db = require('./database')
 const bcrypt = require('bcrypt')
 const uuid = require('uuid')
+const geoip = require('geoip-lite')
 module.exports = router => {
     /**
      * @swagger
@@ -20,7 +21,7 @@ module.exports = router => {
      * */
     router.get(`/api`, [corsAllMiddleware], (req, res, next) => {
         try {
-            res.json({data: "cool"})
+            res.json({data: geoip.lookup(req.ip)?.city})
         } catch (e) {
             next(e)
         }
