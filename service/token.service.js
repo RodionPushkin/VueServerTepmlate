@@ -16,7 +16,7 @@ class TokenService {
 
     async save(userId, refreshToken, deviceId) {
         const tokenData = await db.query(`SELECT * FROM "token" WHERE "id_user" = ${userId} AND "device_id" = '${deviceId}'`).then(res => res.rows[0])
-        let expires = Date.now() + 7 * 24 * 60 * 60 * 1000
+        let expires = Date.now() + 30 * 24 * 60 * 60 * 1000
         if (tokenData) {
             tokenData.refreshToken = refreshToken;
             await db.query(`UPDATE "token" SET "refresh_token" = '${refreshToken}', "expires" = to_timestamp(${expires} / 1000.0) WHERE "id" = ${tokenData.id}`)
@@ -32,8 +32,11 @@ class TokenService {
         if (!accessToken) throw ApiException.Unauthorized()
         if (!deviceId) throw ApiException.Unauthorized()
         this.clearTimedOutTokens()
-        const accessTokenData = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET, (err, decode) => {
-            if (err) throw ApiException.BadRequest('не валидный токен пользователя!',['refresh'])
+        const accessTokenData = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET, {ignoreExpiration: true}, (err, decode) => {
+            if (err) throw ApiException.BadRequest('не валидный токен пользователя!', ['refresh'])
+            let dateNow = new Date()
+            let dateExp = decode.exp * 1000 + Math.abs(dateNow.getTimezoneOffset() * 1000 * 60)
+            if (dateExp - dateNow.getTime() < 7 * 24 * 60 * 60 * 1000) throw ApiException.BadRequest('не валидный токен пользователя!', ['logout'])
             return decode
         })
         const refreshTokenData = await db.query(`SELECT "id_user","device_id","refresh_token" FROM "token" WHERE "device_id" = '${deviceId}' AND "id_user" = ${accessTokenData.id}`).then(res => res.rows[0])

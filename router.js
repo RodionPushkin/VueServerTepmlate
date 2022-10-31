@@ -55,7 +55,7 @@ module.exports = router => {
                 secure: process.env.NODE_ENV ? process.env.NODE_ENV == "production" : false
             })
             res.cookie('refreshToken', tokens.refreshToken, {
-                maxAge: 7 * 24 * 60 * 60 * 1000,
+                maxAge: 30 * 24 * 60 * 60 * 1000,
                 httpOnly: true,
                 secure: process.env.NODE_ENV ? process.env.NODE_ENV == "production" : false
             })
@@ -105,7 +105,7 @@ module.exports = router => {
                 secure: process.env.NODE_ENV ? process.env.NODE_ENV == "production" : false
             })
             res.cookie('refreshToken', tokens.refreshToken, {
-                maxAge: 7 * 24 * 60 * 60 * 1000,
+                maxAge: 30 * 24 * 60 * 60 * 1000,
                 httpOnly: true,
                 secure: process.env.NODE_ENV ? process.env.NODE_ENV == "production" : false
             })
