@@ -61,7 +61,7 @@ class TokenService {
 
     async removeToken(refreshToken) {
         this.clearTimedOutTokens()
-        return await db.query(`DELETE FROM "token" WHERE "refresh_token" = '${refreshToken}' RETURNING `).then(res => res.rows[0])
+        return await db.query(`DELETE FROM "token" WHERE "refresh_token" = '${refreshToken}' RETURNING "id"`).then(res => res.rows[0])
     }
 
     clearTimedOutTokens() {

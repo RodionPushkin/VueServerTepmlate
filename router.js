@@ -76,6 +76,7 @@ module.exports = router => {
             const {refreshToken} = req.cookies
             const token = await tokenService.logout(refreshToken)
             res.clearCookie('refreshToken')
+            res.json(token)
         } catch (e) {
             next(e)
         }
