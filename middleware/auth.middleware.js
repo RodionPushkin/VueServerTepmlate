@@ -4,8 +4,8 @@ const db = require('../database')
 const tokenService = require('../service/token.service')
 module.exports = async (req, res, next) => {
     try{
-        if (req.query.token || req.body.token || req.headers.authorization) {
-            const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : req.body.token ? req.body.token : req.query.token
+        if (req.query.token || req.body.token || req.headers.authorization || req.cookies.refreshToken) {
+            const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : req.headers.refreshToken || req.body.token || req.query.token
             if (!token) throw ApiException.Unauthorized()
             if(!req.cookies.deviceID) throw ApiException.Unauthorized()
             await tokenService.validate(token,req.cookies.deviceID)
