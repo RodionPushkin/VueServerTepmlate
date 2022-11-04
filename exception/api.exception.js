@@ -16,10 +16,6 @@ module.exports = class ApiException extends Error {
         return new ApiException(400, 'Пользователь уже авторизирован!')
     }
 
-    static TokenNotValid() {
-        return new ApiException(401, 'Не валидный токен пользователя!')
-    }
-
     static BadRequest(message, errors = []) {
         return new ApiException(400, message, errors)
     }

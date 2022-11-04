@@ -1,58 +1,70 @@
 const jwt = require('jsonwebtoken')
 const db = require('../database')
 const ApiException = require("../exception/api.exception");
+const bcrypt = require('bcrypt')
 // косяк в защите если украдут refresh token и device id то можно выпустить собственный access token
 // косяк неудобно понимать что токен недействителен не понятно какой конкретно вышел из строя
 // сделать ошибку выхода токена по времени
 class TokenService {
     generate(payload) {
-        const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {expiresIn: '3m'})
-        const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {expiresIn: '7d'})
+        const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {expiresIn: '7d'})
+        const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {expiresIn: '30d'})
         return {
             accessToken,
             refreshToken
         }
     }
 
-    async save(userId, refreshToken, deviceId) {
+    async save(userId, accessToken, refreshToken, deviceId, location) {
         const tokenData = await db.query(`SELECT * FROM "token" WHERE "id_user" = ${userId} AND "device_id" = '${deviceId}'`).then(res => res.rows[0])
         let expires = Date.now() + 30 * 24 * 60 * 60 * 1000
         if (tokenData) {
             tokenData.refreshToken = refreshToken;
-            await db.query(`UPDATE "token" SET "refresh_token" = '${refreshToken}', "expires" = to_timestamp(${expires} / 1000.0) WHERE "id" = ${tokenData.id}`)
+            tokenData.accessToken = accessToken;
+            await db.query(`UPDATE "token" SET "refresh_token" = '${refreshToken}', "access_token" = '${accessToken}', "expires" = to_timestamp(${expires} / 1000.0) WHERE "id" = ${tokenData.id}`)
             delete tokenData.id
             return tokenData
         }
-        const token = await db.query(`INSERT INTO "token" ("id_user","device_id","refresh_token","expires") VALUES (${userId},'${deviceId}','${refreshToken}',to_timestamp(${expires} / 1000.0)) RETURNING "id_user","device_id","refresh_token","expires"`)
+        const token = await db.query(`INSERT INTO "token" ("id_user","device_id","refresh_token","expires","location","access_token") VALUES (${userId},'${deviceId}','${refreshToken}',to_timestamp(${expires} / 1000.0),'${location}','${accessToken}') RETURNING "id_user","location"`)
+        return token
         this.clearTimedOutTokens()
     }
 
-    async validate(accessToken, deviceId) {
-        // удалять рефреш токен если не прошел валидацию
-        if (!accessToken) throw ApiException.Unauthorized()
-        if (!deviceId) throw ApiException.Unauthorized()
+    async validate(accessToken, refreshToken, deviceId, location) {
+        if (!accessToken) return false
+        if (!refreshToken) return false
+        if (!deviceId) return false
         this.clearTimedOutTokens()
-        const accessTokenData = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET, {ignoreExpiration: true}, (err, decode) => {
-            if (err) throw ApiException.BadRequest('не валидный токен пользователя!', ['refresh'])
-            let dateNow = new Date()
-            let dateExp = decode.exp * 1000 + Math.abs(dateNow.getTimezoneOffset() * 1000 * 60)
-            if (dateExp - dateNow.getTime() < 7 * 24 * 60 * 60 * 1000) throw ApiException.BadRequest('не валидный токен пользователя!', ['logout'])
+        accessToken = await this.validateAccessToken(accessToken)
+        refreshToken = await this.validateRefreshToken(refreshToken)
+        if (accessToken && refreshToken) {
+            const TokenFromDB = await db.query(`SELECT "id_user","device_id","refresh_token","access_token","location" FROM "token" WHERE "device_id" = '${deviceId}' AND "id_user" = ${accessToken.id}`).then(res => res.rows[0])
+            if (!TokenFromDB) return false
+            if (!bcrypt.compare(location, TokenFromDB.location)) return false
+            const refreshTokenFromDB = await this.validateRefreshToken(TokenFromDB.refresh_token)
+            const accessTokenFromDB = await this.validateAccessToken(TokenFromDB.access_token)
+            if (JSON.stringify(refreshToken) != JSON.stringify(refreshTokenFromDB)) return false
+            if (JSON.stringify(accessToken) != JSON.stringify(accessTokenFromDB)) return false
+            return true
+        }
+        return false
+    }
+
+    async validateAccessToken(token) {
+        return jwt.verify(token, process.env.JWT_ACCESS_SECRET, (err, decode) => {
+            if (err) return undefined
             return decode
         })
-        const refreshTokenData = await db.query(`SELECT "id_user","device_id","refresh_token" FROM "token" WHERE "device_id" = '${deviceId}' AND "id_user" = ${accessTokenData.id}`).then(res => res.rows[0])
-        if (!refreshTokenData) throw ApiException.TokenNotValid()
-        const refreshToken = jwt.verify(refreshTokenData.refresh_token, process.env.JWT_REFRESH_SECRET, (err, decode) => {
-            if (err) {
-                this.removeToken(refreshToken)
-                throw ApiException.BadRequest('не валидный токен пользователя!',['logout'])
-            }
+    }
+
+    async validateRefreshToken(token) {
+        return jwt.verify(token, process.env.JWT_REFRESH_SECRET, (err, decode) => {
+            if (err) return undefined
             return decode
         })
-        return true
     }
 
     async refresh() {
-        this.clearTimedOutTokens()
     }
 
     async logout(refreshToken) {
