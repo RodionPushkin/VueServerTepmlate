@@ -20,7 +20,12 @@ export default createStore({
         },
         LOAD_USER: (state,payload) => {
             api.get(`user`).then(r => r).then(res=>{
-                state.user = res
+                if(res.message){
+                    console.log(res)
+                }else{
+                    localStorage.token = res.access_token
+                    this.$router.push('/')
+                }
             }).catch(err=>{
                 console.log(err)
             })

@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "user"(
 CREATE TABLE IF NOT EXISTS "token"(
   "id" BIGSERIAL NOT NULL PRIMARY KEY,
   "id_user" BIGINT NOT NULL REFERENCES "user"("id"),
-  "device_id"   CHARACTER VARYING(36) NOT NULL,
+  "device_id" TEXT NOT NULL,
   "refresh_token" TEXT NOT NULL,
   "access_token" TEXT NOT NULL,
   "expires" TIMESTAMP(3) WITHOUT TIME ZONE NOT NULL,

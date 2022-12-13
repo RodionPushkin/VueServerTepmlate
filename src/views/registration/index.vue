@@ -26,8 +26,12 @@ export default {
   methods: {
     send(){
       this.$api.post('user',undefined,{email:this.email,password:this.password}).then(res=>{
-        localStorage.token = res.access_token
-        this.$router.push('/')
+        if(res.message){
+          console.log(res)
+        }else{
+          if(res.access_token) localStorage.token = res.access_token
+          this.$router.push('/')
+        }
       }).catch(err=>{
         console.log(err)
       })

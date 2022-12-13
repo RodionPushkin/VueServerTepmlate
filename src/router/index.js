@@ -7,7 +7,11 @@ const authGuard = async (to, from, next) => {
   let isAuthorized = false
   if (localStorage.token) {
     await api.get(`user`).then(r => r).then(res => {
-      isAuthorized = true
+      if(res.message){
+        console.log(res)
+      }else{
+        isAuthorized = true
+      }
     }).catch(err => {
       console.log(err)
       localStorage.removeItem('token')

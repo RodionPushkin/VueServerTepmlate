@@ -135,7 +135,7 @@ app.use(express.static(path.join(__dirname, 'dist')));
 app.use(errorMiddleware)
 try {
   server.listen(port, () => {
-    console.log(`Server started on: ${config.DOMAIN}:${port} at ${new Date().toLocaleString('ru')}`)
+    console.log(`Server started on: ${config.DOMAIN} at ${new Date().toLocaleString('ru')}`)
     db.checkConnection()
   });
 } catch (e) {
