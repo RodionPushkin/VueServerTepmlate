@@ -1,4 +1,4 @@
-# rodionpushkin.ru
+# AwesomeServer
 
 ## Project setup
 
@@ -15,7 +15,7 @@ npm run dev
 ### Compiles and minifies for production
 
 ```
-npm run buildall
+npm run build
 ```
 
 
