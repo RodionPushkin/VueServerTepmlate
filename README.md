@@ -1,4 +1,4 @@
-# AwesomeServer
+# VueServerTepmlate
 
 ## Project setup
 
