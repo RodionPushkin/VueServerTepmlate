@@ -1,7 +1,20 @@
 {
-  "secret": "",
+  "secret": "some_secret",
   "email_user": "",
   "email_pass": "",
   "email_port": 465,
-  "email_smtp": ""
+  "email_smtp": "",
+  "PORT": 80,
+  "DOMAIN": "http://127.0.0.1:80",
+  "DB_HOST": "localhost",
+  "DB_DATABASE": "postgres",
+  "DB_USER": "postgres",
+  "DB_PASS": "root",
+  "DB_PORT": 5432,
+  "JWT_ACCESS_SECRET": "access_secret",
+  "JWT_REFRESH_SECRET": "refresh_secret",
+  "PEER_HOST": "rodionpushkin.ru",
+  "PEER_SECURE": true,
+  "PEER_PORT": "443",
+  "PEER_PATH": "/peerjs"
 }
