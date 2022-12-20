@@ -10,6 +10,7 @@ const authGuard = async (to, from, next) => {
       if(res.message){
         console.log(res)
       }else{
+        console.log(res)
         isAuthorized = true
       }
     }).catch(err => {

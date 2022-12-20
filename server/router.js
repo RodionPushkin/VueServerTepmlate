@@ -11,8 +11,6 @@ const bcrypt = require('bcrypt')
 const uuid = require('uuid')
 const geoip = require('geoip-lite')
 const path = require('path')
-const CORS = require('cors')
-const whitelist = ['http://localhost', 'http://localhost:8080']
 module.exports = router => {
   /**
    * @swagger
@@ -26,8 +24,7 @@ module.exports = router => {
   router.options('/api', corsAllMiddleware)
   router.get(`/api`, [corsAllMiddleware], (req, res, next) => {
     try {
-      if (req.ip != "::1") res.json({data: `${geoip.lookup(req.ip).country}/${geoip.lookup(req.ip).city}`})
-      else res.json({data: 'moscow'})
+      res.json({data: `${geoip.lookup(req.ip).country}/${geoip.lookup(req.ip).city}`})
     } catch (e) {
       next(e)
     }
@@ -254,6 +251,7 @@ module.exports = router => {
    * */
   router.get(`/api/user`, [corsAllMiddleware, authMiddleware], async (req, res, next) => {
     try {
+      global.peer.emit('huy')
       let access_token = req.query.access_token || req.body.access_token || req.headers.authorization ? req.headers.authorization.split(' ')[1] : undefined
       let refresh_token = req.query.refresh_token || req.body.refresh_token || req.cookies.refresh_token
       if (!access_token && !refresh_token) throw ApiException.Unauthorized()

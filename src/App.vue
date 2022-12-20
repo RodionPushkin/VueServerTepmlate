@@ -29,12 +29,16 @@ export default {
       if(localStorage.getItem('token')){
         this.$api.put('user/refresh').then((res)=>{
           if(res == 'logout'){
+            this.$peer.destroy()
             localStorage.removeItem('token')
           }else{
             localStorage.setItem('token',res.access_token)
+            this.$peer._options.token = localStorage.getItem('token')
+            this.$peer.disconnect()
+            this.$peer.reconnect()
           }
         }).catch(err=>{
-          console.log(err)
+          this.$peer.destroy()
           localStorage.removeItem('token')
         })
       }

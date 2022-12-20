@@ -26,8 +26,11 @@ export default {
       this.$api.put('user',undefined,{email:this.email,password:this.password}).then(res=>{
         if(res.message){
           console.log(res)
-        }else{
-          if(res.access_token) localStorage.token = res.access_token
+        }else if(res.access_token){
+          localStorage.setItem('token',res.access_token)
+          this.$peer._options.token = localStorage.getItem('token')
+          this.$peer.disconnect()
+          this.$peer.reconnect()
           this.$router.push('/')
         }
       }).catch(err=>{

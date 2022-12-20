@@ -18,5 +18,15 @@ npm run dev
 npm run build
 ```
 
+### Compiles for server builds
+
+```
+npm run clientbuild
+```
+
+```
+pm2 start pm2.json --env production
+```
+
 
 

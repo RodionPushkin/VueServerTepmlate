@@ -120,10 +120,14 @@ if (process.env.NODE_ENV == 'production') {
   server = http.createServer(app);
   peer = ExpressPeerServer(server, {
     path: '/peerjs',
+    secure: false,
+    debug: true,
+    allow_discovery: true,
   });
 }
 app.use('/', peer);
 require('./peer')(peer)
+global.peer = peer
 require('./router')(app)
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 app.use(express.static(path.join(__dirname, 'static')));

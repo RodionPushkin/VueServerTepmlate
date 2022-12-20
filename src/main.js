@@ -18,5 +18,6 @@ app.config.globalProperties.$peer = new Peer(undefined, {
     secure: config.PEER_SECURE,
     port: config.PEER_PORT,
     path: config.PEER_PATH,
+    token: localStorage.getItem('token')
 })
 app.use(store).use(router).mount('#app')
