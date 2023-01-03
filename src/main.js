@@ -3,8 +3,9 @@ import {createApp} from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import api from "@/api";
+import api from "./api";
 import config from "../config.json"
+import './style.scss'
 const app = createApp(App).mixin({
     data() {
         return {

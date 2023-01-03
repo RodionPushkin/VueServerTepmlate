@@ -13,11 +13,11 @@
 </template>
 
 <script>
-import headerComponent from "@/components/header.component";
-import mainComponent from "@/components/main.component";
-import footerComponent from "@/components/footer.component";
-import Background from "@/components/background.component";
-import Preloader from "@/components/preloader.component";
+import headerComponent from "@/components/header.component.vue";
+import mainComponent from "@/components/main.component.vue";
+import footerComponent from "@/components/footer.component.vue";
+import Background from "@/components/background.component.vue";
+import Preloader from "@/components/preloader.component.vue";
 
 export default {
   components: {Preloader, Background, headerComponent, mainComponent, footerComponent},
@@ -29,8 +29,7 @@ export default {
       if(localStorage.getItem('token')){
         this.$api.put('user/refresh').then((res)=>{
           if(res == 'logout'){
-            this.$peer.destroy()
-            localStorage.removeItem('token')
+            throw "logout"
           }else{
             localStorage.setItem('token',res.access_token)
             this.$peer._options.token = localStorage.getItem('token')
@@ -40,6 +39,7 @@ export default {
         }).catch(err=>{
           this.$peer.destroy()
           localStorage.removeItem('token')
+          this.$router.push('/auth')
         })
       }
     },3*60*1000)

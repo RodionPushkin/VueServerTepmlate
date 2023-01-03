@@ -1,6 +1,6 @@
 <template>
   <div class="input">
-    <input ref="input" v-model="value" :disabled="disabled ? disabled : false" :maxlength="max ? max : 32"
+    <input ref="input" :disabled="disabled ? disabled : false" :maxlength="max ? max : 32"
            :minlength="min ? min : 3" :readonly="readonly ? readonly : false" :required="required ? required : false"
            :type="type ? type : 'text'" :value="value ? value : ''" placeholder=" "
            @input="$emit('custominput',$event.target.value)">

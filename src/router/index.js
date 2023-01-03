@@ -28,7 +28,7 @@ const authGuard = async (to, from, next) => {
     if (to.path == "/auth" || to.path == "/registration") {
       next()
     } else {
-      next(false)
+      next('/auth')
     }
   }
 };
@@ -58,7 +58,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
   routes
 })
 router.beforeResolve((to, from, next) => {

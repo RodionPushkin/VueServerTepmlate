@@ -19,8 +19,8 @@ module.exports = peer => {
     console.log(client.id,'disconnected')
     await connectionService.disconnect(client.token,client.id)
   });
-  peer.on('huy', async () => {
+  peer.on('customevent', async () => {
     // peer
-    console.log("dick")
+    console.log("customevent")
   });
 }
