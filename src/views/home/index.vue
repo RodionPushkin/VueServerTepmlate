@@ -4,17 +4,10 @@
   </div>
 </template>
 <script>
-
 export default {
   name: "home",
-  data() {
-    return {}
-  },
-  mounted() {
-  },
-  methods: {}
 }
 </script>
-
 <style lang="scss" scoped>
+@import "home.style.scss";
 </style>

@@ -4,6 +4,7 @@ const corsMiddleware = require('./middleware/cors.middleware')
 const corsAllMiddleware = require('./middleware/cors.all.middleware')
 const tokenService = require('./service/token.service')
 const libService = require('./service/lib.service')
+const sharp = require('sharp')
 const ApiException = require('./exception/api.exception')
 const {body, validationResult} = require('express-validator');
 const db = require('./database')
@@ -11,6 +12,129 @@ const bcrypt = require('bcrypt')
 const uuid = require('uuid')
 const geoip = require('geoip-lite')
 const path = require('path')
+const fs = require('fs')
+
+class Longpool {
+  constructor(name) {
+    this.connected = []
+    this.name = name
+  }
+
+  connect(id, req, res, callback) {
+    this.connected.push({
+      id: id,
+      rid: req.rid,
+      req: req,
+      res: res
+    })
+    console.log(`${this.name} connect connected: ${this.connected.length}`)
+    this.notify(id, "connect", callback)
+  }
+
+  disconnect(id, rid, callback) {
+    this.notify(id, "disconnect", callback)
+    this.connected = this.connected.filter(item => item.id != id && item.rid != rid)
+    console.log(`${this.name} disconnect connected: ${this.connected.length}`)
+  }
+
+  notify(id, type, callback = () => {
+  }) {
+    switch (type) {
+      case "update": {
+        console.log(`${this.name} update connected: ${this.connected.length}`)
+        callback(this.connected)
+        break
+      }
+      case "connect": {
+        callback(this.connected)
+        break
+      }
+      case "disconnect": {
+        callback(this.connected)
+        break
+      }
+    }
+  }
+}
+
+const saveFiles = async (files) => {
+  return new Promise(async (resolve, reject) => {
+    let pathForFiles = path.join(__dirname, "/static/")
+    if (files.file.length) {
+      const result = []
+      files.file.forEach((file, index) => {
+        let newFileName = `${uuid.v4()}`
+        let fileType = file.name.split('.')[file.name.split('.').length - 1]
+        file.mv(pathForFiles + `${newFileName}.${fileType}`, async () => {
+          await sharp(pathForFiles + `${newFileName}.${fileType}`).metadata().then(async info => {
+            const config = {
+              jpeg: {quality: 80},
+              webp: {quality: 80},
+              png: {compressionLevel: 8},
+            }
+            await sharp(pathForFiles + `${newFileName}.${fileType}`)[info.format](config[info.format]).resize({
+              width: Math.round(info.width / 3),
+              height: Math.round(info.height / 3),
+            }).toFile(pathForFiles + `${newFileName}.x3.${fileType}`)
+            await sharp(pathForFiles + `${newFileName}.${fileType}`)[info.format](config[info.format]).resize({
+              width: Math.round(info.width / 2),
+              height: Math.round(info.height / 2),
+            }).toFile(pathForFiles + `${newFileName}.x2.${fileType}`)
+            await sharp(pathForFiles + `${newFileName}.${fileType}`)[info.format](config[info.format]).resize({
+              width: Math.round(info.width / 1.2),
+              height: Math.round(info.height / 1.2),
+            }).toFile(pathForFiles + `${newFileName}.x1.${fileType}`)
+            result.push({
+              x3: `${newFileName}.x3.${fileType}`,
+              x2: `${newFileName}.x2.${fileType}`,
+              x1: `${newFileName}.x1.${fileType}`,
+              original: `${newFileName}.${fileType}`,
+            })
+            if (result.length == files.file.length) {
+              resolve({
+                x3: `${newFileName}.x3.${fileType}`,
+                x2: `${newFileName}.x2.${fileType}`,
+                x1: `${newFileName}.x1.${fileType}`,
+                original: `${newFileName}.${fileType}`,
+              })
+            }
+          })
+        })
+      })
+    } else {
+      let newFileName = `${uuid.v4()}`
+      let fileType = files.file.name.split('.')[files.file.name.split('.').length - 1]
+      await files.file.mv(pathForFiles + `${newFileName}.${fileType}`, async () => {
+        await sharp(pathForFiles + `${newFileName}.${fileType}`).metadata().then(async info => {
+          const config = {
+            jpeg: {quality: 80},
+            webp: {quality: 80},
+            png: {compressionLevel: 8},
+          }
+          await sharp(pathForFiles + `${newFileName}.${fileType}`)[info.format](config[info.format]).resize({
+            width: Math.round(info.width / 3),
+            height: Math.round(info.height / 3),
+          }).toFile(pathForFiles + `${newFileName}.x3.${fileType}`)
+          await sharp(pathForFiles + `${newFileName}.${fileType}`)[info.format](config[info.format]).resize({
+            width: Math.round(info.width / 2),
+            height: Math.round(info.height / 2),
+          }).toFile(pathForFiles + `${newFileName}.x2.${fileType}`)
+          await sharp(pathForFiles + `${newFileName}.${fileType}`)[info.format](config[info.format]).resize({
+            width: Math.round(info.width / 1.2),
+            height: Math.round(info.height / 1.2),
+          }).toFile(pathForFiles + `${newFileName}.x1.${fileType}`)
+          resolve({
+            x3: `${newFileName}.x3.${fileType}`,
+            x2: `${newFileName}.x2.${fileType}`,
+            x1: `${newFileName}.x1.${fileType}`,
+            original: `${newFileName}.${fileType}`,
+          })
+        })
+      })
+    }
+  })
+}
+
 module.exports = router => {
   /**
    * @swagger
@@ -24,7 +148,7 @@ module.exports = router => {
   router.options('/api', corsAllMiddleware)
   router.get(`/api`, [corsAllMiddleware], (req, res, next) => {
     try {
-      res.json({data: `${geoip.lookup(req.ip).country}/${geoip.lookup(req.ip).city}`})
+      res.json({data: `hello world`})
     } catch (e) {
       next(e)
     }
@@ -81,7 +205,7 @@ module.exports = router => {
         secure: process.env.NODE_ENV ? process.env.NODE_ENV == "production" : false
       })
       res.set('Authorization', `Bearer ${tokens.accessToken}`)
-      res.json({access_token: tokens.accessToken,refresh_token: tokens.refreshToken, user})
+      res.json({access_token: tokens.accessToken, refresh_token: tokens.refreshToken, user})
     } catch (e) {
       next(e)
     }
@@ -136,7 +260,7 @@ module.exports = router => {
         secure: process.env.NODE_ENV ? process.env.NODE_ENV == "production" : false
       })
       res.set('Authorization', `Bearer ${tokens.accessToken}`)
-      res.json({access_token: tokens.accessToken,refresh_token: tokens.refreshToken, user})
+      res.json({access_token: tokens.accessToken, refresh_token: tokens.refreshToken, user})
     } catch (e) {
       next(e)
     }
@@ -222,7 +346,7 @@ module.exports = router => {
         secure: process.env.NODE_ENV ? process.env.NODE_ENV == "production" : false
       })
       res.set('Authorization', `Bearer ${tokens.accessToken}`)
-      res.json({access_token: tokens.accessToken,refresh_token: tokens.refreshToken, user})
+      res.json({access_token: tokens.accessToken, refresh_token: tokens.refreshToken, user})
     } catch (e) {
       next(e)
     }
@@ -251,7 +375,6 @@ module.exports = router => {
    * */
   router.get(`/api/user`, [corsAllMiddleware, authMiddleware], async (req, res, next) => {
     try {
-      global.peer.emit('huy')
       let access_token = req.query.access_token || req.body.access_token || req.headers.authorization ? req.headers.authorization.split(' ')[1] : undefined
       let refresh_token = req.query.refresh_token || req.body.refresh_token || req.cookies.refresh_token
       if (!access_token && !refresh_token) throw ApiException.Unauthorized()
@@ -267,22 +390,6 @@ module.exports = router => {
     }
   })
   router.post(`/api/upload`, [corsMiddleware], async (req, res) => {
-    // console.log(req.files.file);
-    let newFileName = `${new Date().getTime()}.csv`
-    console.log(path.join(__dirname, "/python/", `${newFileName}`))
-    req.files.file.mv(path.join(__dirname, "/python/", `${newFileName}`), () => {
-    })
-    setTimeout(() => {
-      res.json('ok')
-    }, 20000)
-
-  })
-  router.get(`/api/python`, [corsAllMiddleware], async (req, res) => {
-    let data = await libService.ExecutePython('test', JSON.stringify({"data": "python is working"}))
-    if (data == "error of execution") {
-      res.json(data)
-    } else {
-      res.json(JSON.parse(data.replaceAll("'", '"')))
-    }
+    res.json(await saveFiles(req.files))
   })
 }

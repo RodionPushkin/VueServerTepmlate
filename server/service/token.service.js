@@ -23,9 +23,8 @@ class TokenService {
             delete tokenData.id
             return tokenData
         }
-        const token = await db.query(`INSERT INTO "token" ("id_user","device_id","refresh_token","expires","location","access_token") VALUES (${userId},'${deviceId}','${refreshToken}',to_timestamp(${expires} / 1000.0),'${location}','${accessToken}') RETURNING "id_user","location"`)
-        return token
         this.clearTimedOutTokens()
+        return await db.query(`INSERT INTO "token" ("id_user","device_id","refresh_token","expires","location","access_token") VALUES (${userId},'${deviceId}','${refreshToken}',to_timestamp(${expires} / 1000.0),'${location}','${accessToken}') RETURNING "id_user","location"`)
     }
 
     async validate(accessToken, refreshToken, deviceId, location) {

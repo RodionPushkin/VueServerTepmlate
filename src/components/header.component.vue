@@ -2,23 +2,18 @@
   <header class="header">
     <div ref="container" class="container">
       <router-link class="logo" to="/" @click="isMenuOpened = false">
-        logo
+        hackers <span>54</span>
       </router-link>
       <input id="burger" v-model="isMenuOpened" type="checkbox">
       <label for="burger">
-        <svg class="feather feather-menu" fill="none" height="24" stroke="currentColor" stroke-linecap="round"
-             stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"
-             xmlns="http://www.w3.org/2000/svg">
-          <line x1="3" x2="21" y1="12" y2="12"></line>
-          <line x1="3" x2="21" y1="6" y2="6"></line>
-          <line x1="3" x2="21" y1="18" y2="18"></line>
-        </svg>
+        <span></span>
+        <span></span>
+        <span></span>
       </label>
       <nav class="nav">
         <router-link to="/" @click="isMenuOpened = false">главная</router-link>
-        <router-link to="/404" @click="isMenuOpened = false">404</router-link>
-        <router-link to="/auth" @click="isMenuOpened = false">авторизация</router-link>
-        <router-link to="/registration" @click="isMenuOpened = false">регистрация</router-link>
+        <router-link to="/we" @click="isMenuOpened = false">мы</router-link>
+        <router-link to="/hackathons" @click="isMenuOpened = false">хакатоны</router-link>
       </nav>
     </div>
   </header>
@@ -41,7 +36,7 @@ export default {
 <style lang="scss" scoped>
 .header {
   position: fixed;
-  background: rgba(12, 12, 12, 0.4);
+  background: var(--color-main-30);
   backdrop-filter: blur(4px);
   top: 0;
   left: 0;
@@ -61,12 +56,7 @@ export default {
     user-select: none;
 
     span {
-      transition: 0.3s;
-    }
-
-    .active {
-      color: var(--main-color);
-      transform: scaleY(1.5);
+      color: var(--color-accent);
     }
   }
 
@@ -74,14 +64,21 @@ export default {
     display: flex;
     gap: 32px;
     align-items: center;
-    font-size: 18px;
 
     a {
       user-select: none;
+      transition: color 0.2s;
+      font-size: var(--font-m);
+      @media screen and (min-width: 768px) {
+        font-size: var(--font-xs);
+        &:hover {
+          color: var(--color-accent);
+        }
+      }
     }
 
     @media screen and (max-width: 768px) {
-      color: var(--font-color4);
+      color: var(--color-font);
       font-weight: 600;
       font-size: 20px;
     }
@@ -96,63 +93,109 @@ export default {
   }
 
   @media screen and (max-width: 768px) {
-    background: var(--bg-color);
+    background: var(--color-main-30);
     backdrop-filter: none;
     .logo {
       z-index: 999;
     }
     .nav {
-      display: none;
+      display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       position: absolute;
       width: 100vw;
       height: 100vh;
-      left: 100vw;
       top: 0;
+      left: 0;
       opacity: 0;
+      pointer-events: none;
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(22px);
+      transition: 0.2s;
     }
     label {
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 56px;
-      height: 56px;
+      flex-direction: column;
+      width: 48px;
+      aspect-ratio: 1/1;
       border-radius: 50%;
       position: relative;
       z-index: 999;
       cursor: pointer;
+      transition: 0.2s;
+
+      span {
+        width: 32px;
+        height: 3px;
+        border-radius: 2px;
+        background: var(--color-font-30);
+        position: absolute;
+        transition: 0.2s;
+
+        &:nth-child(1) {
+          transform: translateY(-8px);
+        }
+
+        &:nth-child(2) {
+
+        }
+
+        &:nth-child(3) {
+          transform: translateY(8px);
+        }
+      }
+
+      @media screen and (min-width: 568px) {
+        &:hover {
+          span {
+            background: var(--color-accent);
+
+            &:nth-child(2) {
+              width: 18px;
+            }
+          }
+        }
+      }
     }
     input:checked ~ label {
-      transform: rotate(-90deg);
+      transform: rotate(-180deg);
+
+      span {
+        background: var(--color-accent);
+
+        &:nth-child(1) {
+          transform: rotate(-45deg);
+        }
+
+        &:nth-child(2) {
+          width: 0px;
+        }
+
+        &:nth-child(3) {
+          transform: rotate(45deg);
+        }
+      }
+
+      @media screen and (min-width: 568px) {
+        &:hover {
+          span {
+            background: var(--color-accent);
+
+            &:nth-child(2) {
+              width: 0px;
+            }
+          }
+        }
+      }
     }
     input:checked ~ .nav {
-      display: flex;
-      left: 0;
       opacity: 1;
-      transition: opacity 0.4s linear, left 0.3s linear;
+      pointer-events: all;
+      transition: opacity 0.2s linear;
       z-index: 998;
-    }
-  }
-}
-</style>
-<style lang="scss">
-.header .nav a {
-  user-select: none;
-  transition: opacity 0.2s linear;
-  padding: 6px;
-
-  &.router-link-active {
-    //border-bottom: 1px solid var(--font-color);
-    //color: var(--main-color);
-  }
-
-  @media screen and (max-width: 768px) {
-    &:hover {
-      opacity: 0.8;
     }
   }
 }

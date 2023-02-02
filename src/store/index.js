@@ -19,16 +19,16 @@ export default createStore({
             state.isFirstLoad = payload
         },
         LOAD_USER: (state,payload) => {
-            api.get(`user`).then(r => r).then(res=>{
-                if(res.message){
-                    console.log(res)
-                }else{
-                    localStorage.token = res.access_token
-                    this.$router.push('/')
-                }
-            }).catch(err=>{
-                console.log(err)
-            })
+            // api.get(`user`).then(r => r).then(res=>{
+            //     if(res.message){
+            //         console.log(res)
+            //     }else{
+            //         localStorage.token = res.access_token
+            //         this.$router.push('/')
+            //     }
+            // }).catch(err=>{
+            //     console.log(err)
+            // })
         }
     },
     actions: {

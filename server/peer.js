@@ -6,8 +6,8 @@ module.exports = peer => {
     // peer.listAllPeers((data)=>{
     //   console.log(data)
     // })
-    console.log(client.id,'connected')
-    await connectionService.connect(client.token,client.id)
+    console.log(client.id, 'peer connected')
+    await connectionService.connect(client.token, client.id)
     // client.socket.on('message', data => {
     //   //message to filter
     //   console.log('from client:', data);
@@ -16,8 +16,8 @@ module.exports = peer => {
 
   });
   peer.on('disconnect', async (client) => {
-    console.log(client.id,'disconnected')
-    await connectionService.disconnect(client.token,client.id)
+    console.log(client.id, 'peer disconnected')
+    await connectionService.disconnect(client.token, client.id)
   });
   peer.on('customevent', async () => {
     // peer

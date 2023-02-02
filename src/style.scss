@@ -1,21 +1,116 @@
-:root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #050505;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+.container {
+  width: 100%;
+  max-width: 2640px;
+  padding: 0 100px;
+  margin: 0 auto;
+  @media screen and (max-width: 1921px) {
+    max-width: 1920px;
+    padding: 0 100px;
+  }
+  @media screen and (max-width: 1400px) {
+    max-width: 1256px;
+    padding: 0 72px;
+  }
+  @media screen and (max-width: 1024px) {
+    padding: 0 24px;
+  }
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+
+.input {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column-reverse;
+  margin-top: 28px;
+
+  label {
+    color: var(--color-font);
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    transform: translateY(-50%);
+    transition: top 0.2s ease-in-out, font-size 0.25s ease-in-out;
+    pointer-events: none;
+    font-size: 14px;
+    user-select: none;
   }
+
+  input:focus ~ label, input:not(:placeholder-shown) ~ label {
+    top: -11px;
+    font-size: 12px;
+    transform: translateY(0%);
+    color: var(--color-font-75);
+  }
+}
+
+.input-checkbox {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  label:first-of-type {
+    display: inline-flex;
+    padding: 2px;
+    height: 20px;
+    width: 40px;
+    background: var(--color-main);
+    border-radius: 20px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.03);
+    cursor: pointer;
+    user-select: none;
+    @media screen and (max-width: 768px) {
+      padding: 4px;
+      height: 30px;
+      width: 60px;
+    }
+
+    &:before {
+      content: '';
+      height: 16px;
+      aspect-ratio: 1/1;
+      background: var(--color-main-30);
+      margin-left: 0px;
+      transition: margin-left 0.3s;
+      border-radius: 20px;
+      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.03);
+      cursor: pointer;
+      user-select: none;
+      @media screen and (max-width: 768px) {
+        height: 22px;
+        aspect-ratio: 1/1;
+      }
+    }
+  }
+
+  input {
+    display: none;
+  }
+
+  input:checked ~ label:first-of-type {
+    &:before {
+      background: var(--color-accent);
+      margin-left: 20px;
+      @media screen and (max-width: 768px) {
+        margin-left: 30px;
+      }
+    }
+  }
+
+  label:last-of-type {
+    cursor: pointer;
+    user-select: none;
+    @media screen and (max-width: 768px) {
+      font-size: 16px;
+    }
+  }
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }

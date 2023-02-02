@@ -36,7 +36,7 @@ class api {
     if (!headers) {
       headers = {}
     }
-    if(localStorage.getItem('token')){
+    if (localStorage.getItem('token')) {
       headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`
     }
     headers["Content-Type"] = 'application/json'
@@ -55,15 +55,75 @@ class api {
         return []
       })
   }
-  async userRefresh() {
+
+  async user_refresh() {
+    if (localStorage.getItem('token')) {
+      this.$api.put('user/refresh').then((res) => {
+        if (res == 'logout') {
+          throw "logout"
+        } else {
+          localStorage.setItem('token', res.access_token)
+          // this.$peer._options.token = localStorage.getItem('token')
+          // this.$peer.disconnect()
+          // this.$peer.reconnect()
+        }
+      }).catch(err => {
+        console.log(err)
+        if (err == "logout") {
+          this.user_logout()
+        }
+      })
+    }
   }
-  async userLogout() {
+
+  async user_logout() {
+    this.delete('user')
+    localStorage.removeItem('token')
+    this.$router.push('/')
+    // this.$peer.destroy()
   }
-  async userLogin() {
+
+  async user_login(email, password) {
+    this.$api.put('user', undefined, {email, password}).then(res => {
+      if (res.message) {
+        console.log(res)
+      } else if (res.access_token) {
+        localStorage.setItem('token', res.access_token)
+        // this.$peer._options.token = localStorage.getItem('token')
+        // this.$peer.disconnect()
+        // this.$peer.reconnect()
+        this.$router.push('/')
+      }
+    }).catch(err => {
+      console.log(err)
+    })
   }
-  async userRegistration() {
+
+  async user_registration(email, password) {
+    this.$api.post('user', undefined, {email, password}).then(res => {
+      if (res.message) {
+        console.log(res)
+      } else if (res.access_token) {
+        localStorage.setItem('token', res.access_token)
+        // this.$peer._options.token = localStorage.getItem('token')
+        // this.$peer.disconnect()
+        // this.$peer.reconnect()
+        this.$router.push('/')
+      }
+    }).catch(err => {
+      console.log(err)
+    })
   }
-  async userSelf() {
+
+  async user_self() {
+    await this.$api.get('user').then(res => {
+      return res
+    }).catch(err => {
+      console.log(err)
+      if (err == "logout") {
+        this.user_logout()
+      }
+    })
   }
 }
 

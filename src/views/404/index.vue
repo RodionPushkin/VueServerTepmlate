@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import './404.style.scss';
 
 export default {
   name: "404",
@@ -24,13 +25,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-p{
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  text-align: center;
-}
-</style>

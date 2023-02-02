@@ -1,0 +1,22 @@
+.container {
+  flex: 1 0 auto;
+  display: flex;
+  align-items: flex-end;
+
+  h1 {
+    position: fixed;
+    z-index: 9;
+    font-size: 12vw;
+    margin-top: auto;
+    pointer-events: none;
+    bottom: 64px;
+    user-select: none;
+    @media screen and (max-width: 768px) {
+      font-size: 15vw;
+    }
+
+    span {
+      color: var(--color-accent);
+    }
+  }
+}

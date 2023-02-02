@@ -1,16 +1,16 @@
 const express = require('express')
-const app = express();
+const http2Express = require('http2-express-bridge')
+const app = process.env.NODE_ENV == 'production' ? http2Express(express) : express();
 const {ExpressPeerServer} = require('peer');
 const http = require('http');
-const https = require('spdy');
-const httpsRedirect = require('express-https-redirect');
+const https = require('http2');
 const session = require('cookie-session');
 const history = require('connect-history-api-fallback');
 const path = require('path');
 const db = require("./database");
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const port = process.env.NODE_ENV == 'production' ? 443 : process.env.PORT || 80;
+const port = process.env.NODE_ENV == 'production' ? 443 : 80;
 const ruid = require('express-ruid');
 const config = require('../config.json');
 const fileUpload = require('express-fileupload');
@@ -20,9 +20,6 @@ const swaggerUi = require('swagger-ui-express')
 const fs = require('fs')
 const {promisify} = require("util")
 const readFile = promisify(fs.readFile)
-const limiter = require("express-rate-limit");
-const slowDown = require("express-slow-down");
-const compression = require("compression");
 const errorMiddleware = require('./middleware/error.middleware')
 const swaggerDocs = swaggerJsDoc({
   swaggerDefinition: {
@@ -33,21 +30,6 @@ const swaggerDocs = swaggerJsDoc({
     }
   }, apis: ['./server/router.js']
 });
-// app.use(require('cors')({
-//   credentials: true, methods: ['OPTION', 'GET', 'POST', 'PUT', 'DELETE'], origin: '*'
-// }));
-// app.use(limiter({
-//     windowMs: 3 * 60 * 1000,
-//     max: 100,
-//     message: 'Too many requests, please try again after an 3 min',
-//     standardHeaders: true,
-//     legacyHeaders: false,
-// }))
-// app.use(slowDown({
-//     windowMs: 15 * 60 * 1000,
-//     delayAfter: 100,
-//     delayMs: 500
-// }))
 app.use(fileUpload({
   useTempFiles: true, tempFileDir: '/tmp/',
   // abortOnLimit: true,
@@ -62,19 +44,32 @@ app.use(session({
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-app.use(helmet());
-app.use(compression())
+app.use(
+  helmet({
+    crossOriginEmbedderPolicy: false,
+    contentSecurityPolicy: false
+  }),
+);
+require('./router')(app)
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
+app.use("/api/static", express.static(path.join(__dirname, 'static')));
+app.use(express.static(path.join(__dirname, 'static')));
+app.use(express.static(path.join(__dirname, 'dist')));
+app.use(history({
+  index: '/index.html'
+}));
+app.use(express.static(path.join(__dirname, 'static')));
+app.use(express.static(path.join(__dirname, 'dist')));
+app.use("/", express.static(path.join(__dirname, 'dist')));
+
+app.use(errorMiddleware)
 let server;
 let peer
 if (process.env.NODE_ENV == 'production') {
-  app.enable('trust proxy')
-  app.use(httpsRedirect())
-  app.use((req, res, next) => {
-    req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
-  })
-  const ssl = {
+  const options = {
     key: fs.readFileSync(path.join(__dirname, '../privkey.pem')),
-    cert: fs.readFileSync(path.join(__dirname, '../fullchain.pem'))
+    cert: fs.readFileSync(path.join(__dirname, '../fullchain.pem')),
+    allowHTTP1: true
   }
   app.get("/push", async (req, res) => {
     try {
@@ -84,17 +79,7 @@ if (process.env.NODE_ENV == 'production') {
           files.push(file)
         })
       });
-      await fs.readdir('./dist/js', (err, readedfiles) => {
-        readedfiles.filter(item => item.includes('.') && item != '.gitkeep').forEach(file => {
-          files.push(file)
-        })
-      });
-      await fs.readdir('./dist/css', (err, readedfiles) => {
-        readedfiles.filter(item => item.includes('.') && item != '.gitkeep').forEach(file => {
-          files.push(file)
-        })
-      });
-      await fs.readdir('./dist/sounds', (err, readedfiles) => {
+      await fs.readdir('./dist/assets', (err, readedfiles) => {
         readedfiles.filter(item => item.includes('.') && item != '.gitkeep').forEach(file => {
           files.push(file)
         })
@@ -111,9 +96,9 @@ if (process.env.NODE_ENV == 'production') {
       res.status(500).send(error.toString())
     }
   })
-  server = https.createServer(ssl, app);
+  server = https.createSecureServer(options, app);
   peer = ExpressPeerServer(server, {
-    path: '/peerjs', ssl: ssl, proxied: true,
+    path: '/peerjs', ssl: options, proxied: true,
   });
 } else {
   server = http.createServer(app);
@@ -127,18 +112,9 @@ if (process.env.NODE_ENV == 'production') {
 app.use('/', peer);
 require('./peer')(peer)
 global.peer = peer
-require('./router')(app)
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
-app.use(express.static(path.join(__dirname, 'static')));
-app.use(express.static(path.join(__dirname, 'dist')));
-app.use(history({
-  index: '/index.html'
-}));
-app.use(express.static(path.join(__dirname, 'dist')));
-app.use(errorMiddleware)
 try {
   server.listen(port, () => {
-    console.log(`Server started on: ${config.DOMAIN} at ${new Date().toLocaleString('ru')}`)
+    console.log(`Server started on: http${port == 443 ? 's' : ''}://${config.DOMAIN} at ${new Date().toLocaleString('ru')}`)
     db.checkConnection()
   });
 } catch (e) {

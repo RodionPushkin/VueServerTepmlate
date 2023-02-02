@@ -36,54 +36,43 @@ export default {
   top: 0;
   left: 0;
   z-index: 999999;
-  background: var(--bg-color);
+  background: var(--color-main);
   transition: opacity 0.3s;
-  transition-delay: 0.3s;
+  transition-delay: 0.6s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  .round-dark {
-    position: absolute;
-    left: 30vw;
-    top: 80vh;
-    transform: translate(-50%, -50%);
-    width: 200px;
-    aspect-ratio: 1/1;
-    border-radius: 50%;
-    background: var(--bg-dark-color);
-    z-index: 1;
-    filter: blur(5px);
-  }
-
-  .round-light {
-    position: absolute;
-    left: 100vw;
-    top: 55vh;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    aspect-ratio: 1/1;
-    border-radius: 50%;
-    background: var(--bg-light-color);
-    z-index: 1;
-    filter: blur(120px);
-  }
-
-  img {
-    height: 33%;
-    width: 100vw;
-    object-fit: cover;
-    transition: transform 0.4s;
-    user-select: none;
-    pointer-events: none;
-    z-index: 3;
-  }
-
-  span {
-    color: var(--main-color);
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+  div {
+    transition: 0.2s;
+    font-size: 128px;
     text-align: center;
-    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    height: 128px;
+    overflow: hidden;
+    user-select: none;
+
+    span {
+      animation: 0.8s preloader 0.2s forwards;
+
+      &:nth-child(55) {
+        color: var(--color-accent);
+      }
+
+      @keyframes preloader {
+        0% {
+          transform: translateY(0);
+        }
+        100% {
+          transform: translateY(-6912px);
+        }
+      }
+    }
+  }
+
+  .active {
+    color: var(--color-accent);
   }
 
   &.closed {
