@@ -1,11 +1,10 @@
 <template>
-  <div>
-    <p class="m">Упс, ошибка 404, вы будете перенесены на главную страницу через {{time}} сек.</p>
+  <div class="container">
+    <p>Упс, ошибка 404, вы будете перенесены на главную страницу через {{time}} сек.</p>
   </div>
 </template>
 
 <script>
-import './404.style.scss';
 
 export default {
   name: "404",
@@ -25,3 +24,13 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 0 auto;
+  font-size: var(--font-xl);
+  text-align: center;
+}
+</style>

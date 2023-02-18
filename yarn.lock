@@ -2704,6 +2704,16 @@ simple-update-notifier@^1.0.7:
   dependencies:
     semver "~7.0.0"
 
+smooth-dnd-touch@0.12.2:
+  version "0.12.2"
+  resolved "https://registry.yarnpkg.com/smooth-dnd-touch/-/smooth-dnd-touch-0.12.2.tgz#17c22883ba1707bd7aec8fa052345f2684690f87"
+  integrity sha512-MIyDW3wfUduk273GbHnx6XzSx8Dn5uYbW1SlF9IZmINXtWe9vCXqXkZQ5MKPhlXZ8twSc3YScMac9hayXVACoA==
+
+smooth-dnd@0.12.1:
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/smooth-dnd/-/smooth-dnd-0.12.1.tgz#cdb44c972355659e32770368b29b6a80e0ed96f1"
+  integrity sha512-Dndj/MOG7VP83mvzfGCLGzV2HuK1lWachMtWl/Iuk6zV7noDycIBnflwaPuDzoaapEl3Pc4+ybJArkkx9sxPZg==
+
 "source-map-js@>=0.6.2 <2.0.0", source-map-js@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.0.2.tgz#adbc361d9c62df380125e7f161f71c826f1e490c"
@@ -3093,6 +3103,20 @@ vue-router@^4.0.3:
   integrity sha512-DYWYwsG6xNPmLq/FmZn8Ip+qrhFEzA14EI12MsMgVxvHFDYvlr4NXpVF5hrRH1wVcDP8fGi5F4rxuJSl8/r+EQ==
   dependencies:
     "@vue/devtools-api" "^6.4.5"
+
+vue-smooth-dnd-touch@^0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/vue-smooth-dnd-touch/-/vue-smooth-dnd-touch-0.8.2.tgz#d62937db0cf3dff918412374f3b449a9d321dc97"
+  integrity sha512-E3rr1hOUgwC9RtjVbdO+MRYQAJpeiPbo4VugJV3htBUkQmQaEEzuCjZpK0Wb1wQv+IOaZ6bMmaPlLQfQF7lOzw==
+  dependencies:
+    smooth-dnd-touch "0.12.2"
+
+vue-smooth-dnd@^0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/vue-smooth-dnd/-/vue-smooth-dnd-0.8.1.tgz#b1c584cfe49b830a402548b4bf08f00f68f430e5"
+  integrity sha512-eZVVPTwz4A1cs0+CjXx/ihV+gAl3QBoWQnU6+23Gp59t0WBU99z7ducBQ4FvjBamqOlg8SDOE5eFHQedxwB4Wg==
+  dependencies:
+    smooth-dnd "0.12.1"
 
 vue@^3.2.13:
   version "3.2.47"
